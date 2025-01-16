@@ -2,6 +2,26 @@ import { useState } from 'react'
 
 const Title = (props) => <h1> {props.title} </h1>
 
+const Statistics = (props) => {
+  if (props.stats.all.length === 0) {
+    return (
+      <div>
+        No feedback given
+      </div>
+    )
+  }
+  return (
+    <p>
+    {"good"} {props.stats.good} <br/> 
+    {"neutral"} {props.stats.neutral} <br/> 
+    {"bad"} {props.stats.bad} <br/> 
+    {"all"} {props.stats.all} <br/> 
+    {"average"} {props.stats.average} <br/> 
+    {"positive"} {props.stats.positive} %
+    </p>
+  )
+}
+
 const App = () => {
   const title1 = "give feedback"
   const title2 = "statistics"
@@ -43,6 +63,15 @@ const App = () => {
     setPositive(updatedPositive)
   }
 
+  let stats = {
+    good: good,
+    neutral: neutral,
+    bad: bad,
+    all: all,
+    average: average,
+    positive: positive
+  }
+
   return (
     <div>
       <Title title={title1} />
@@ -51,14 +80,7 @@ const App = () => {
       <button onClick={handleBadClick}>bad</button>
       <Title title={title2} />
 
-      <p>
-      {"good"} {good} <br/> 
-      {"neutral"} {neutral} <br/> 
-      {"bad"} {bad} <br/> 
-      {"all"} {all} <br/> 
-      {"average"} {average} <br/> 
-      {"positive"} {positive} %
-      </p>
+      <Statistics stats = {stats}/>
 
     </div>
   )
