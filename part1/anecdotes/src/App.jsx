@@ -27,16 +27,19 @@ const App = () => {
   }
 
   const handleNextClick = () => {
-    const currentAnecdoteNr = getRandomInt(anecdotes.length)
-    setSelected(currentAnecdoteNr)
+    const currentAnecdoteIndex = getRandomInt(anecdotes.length)
+    setSelected(currentAnecdoteIndex)
+    console.log("Index of current anecdote: ", currentAnecdoteIndex)
   }
 
   const handleVoteClick = () => {
     const copyVotes = [...votes]
     copyVotes[selected] += 1 
     setVotes(copyVotes)
+    console.log("updated votes: ", copyVotes)
     let maxIndex = copyVotes.indexOf(Math.max(...copyVotes));
     setMaxVoteIndex(maxIndex)
+    console.log("Index of highest vote: ", maxIndex)
   }
 
   return (
