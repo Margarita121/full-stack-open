@@ -1,22 +1,12 @@
 import { useState } from 'react'
 
-const Anecdote = (props) => {
-  return (
-    <p>
-      {props.value}
-    </p>
-  )
-}
-
-const Votes = (props) => {
-  return (
-    <p>
-      has {props.value} votes
-    </p>
-  )
-}
+const Title = (props) => <h2> {props.title} </h2>
+const Anecdote = (props) => <p> {props.value} </p>
+const Votes = (props) => <p> has {props.value} votes </p>
 
 const App = () => {
+  const title1 = "Anecdote of the day"
+  const title2 = "Anecdote with most votes"
   const anecdotes = [
     'If it hurts, do it more often.',
     'Adding manpower to a late software project makes it later!',
@@ -28,8 +18,9 @@ const App = () => {
     'The only way to go fast, is to go well.'
   ]  
   const [selected, setSelected] = useState(0)
-  const votesArray = new Uint8Array(7)
+  const votesArray = new Uint8Array(8)
   const [votes, setVotes] = useState(votesArray)
+  const [maxVoteIndex, setMaxVoteIndex] = useState(0)
 
   function getRandomInt(max) {
     return Math.floor(Math.random() * max);
@@ -38,26 +29,26 @@ const App = () => {
   const handleNextClick = () => {
     const currentAnecdoteNr = getRandomInt(anecdotes.length)
     setSelected(currentAnecdoteNr)
-    console.log("current anecdote nr")
-    console.log(currentAnecdoteNr)
   }
 
   const handleVoteClick = () => {
     const copyVotes = [...votes]
-    console.log("before updating votes")
-    console.log(copyVotes)
     copyVotes[selected] += 1 
     setVotes(copyVotes)
-    console.log("updated votes")
-    console.log(copyVotes)
+    let maxIndex = copyVotes.indexOf(Math.max(...copyVotes));
+    setMaxVoteIndex(maxIndex)
   }
 
   return (
     <div>
+      <Title title={title1} />
       <Anecdote value={anecdotes[selected]}/>
       <Votes value={votes[selected]}/>
       <button onClick={handleVoteClick}>vote</button>
       <button onClick={handleNextClick}>next anecdote</button>
+      <Title title={title2} />
+      <Anecdote value={anecdotes[maxVoteIndex]}/>
+      <Votes value={votes[maxVoteIndex]}/>
     </div>
   )
 }
