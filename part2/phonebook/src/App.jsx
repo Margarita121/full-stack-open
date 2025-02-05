@@ -26,6 +26,8 @@ const App = () => {
     }
   };
 
+
+
   const handleInputNameChange = (event) => {
     setNewName(event.target.value);
   };
