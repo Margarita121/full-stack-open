@@ -31,6 +31,13 @@ const App = () => {
     });
   };
 
+  const deletePerson = (id) => {
+    if (window.confirm("Do you really want to leave?")) {
+      personService.deleteById(id);
+      setPersons(persons.filter((p) => p.id !== id));
+    }
+  };
+
   const contactsToShow = newFilter
     ? persons.filter((person) =>
         person.name.toLowerCase().includes(newFilter.toLowerCase())
@@ -62,7 +69,7 @@ const App = () => {
         numberOnChange={handleInputNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons contactsToShow={contactsToShow} />
+      <Persons contactsToShow={contactsToShow} deletePerson={deletePerson} />
     </div>
   );
 };
