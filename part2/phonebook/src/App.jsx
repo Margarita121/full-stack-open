@@ -24,17 +24,50 @@ const App = () => {
       id: persons.length + 1,
     };
 
-    personService.create(personObject).then((returnedPerson) => {
-      setPersons(persons.concat(returnedPerson));
-      setNewName("");
-      setNewNumber("");
-    });
+    const existingPerson = persons.find((p) => p.name === personObject.name);
+    // if person is already added there is option to update number
+    if (existingPerson) {
+      console.log(`There is existing person ${existingPerson.name}`);
+      console.log(`updated number ${personObject.number}`);
+      if (
+        window.confirm(
+          `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const changedPerson = {
+          ...existingPerson,
+          number: personObject.number,
+        };
+
+        personService
+          .update(existingPerson.id, changedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((p) =>
+                p.id === existingPerson.id ? returnedPerson : p
+              )
+            );
+          })
+          .catch((error) => {
+            alert(
+              `the person '${existingPerson.content}' was already deleted from server`
+            );
+            setPersons(persons.filter((p) => p.id !== existingPerson.id));
+          });
+      }
+    } else {
+      personService.create(personObject).then((returnedPerson) => {
+        setPersons(persons.concat(returnedPerson));
+      });
+    }
+    setNewName("");
+    setNewNumber("");
   };
 
-  const deletePerson = (id) => {
-    if (window.confirm("Do you really want to leave?")) {
-      personService.deleteById(id);
-      setPersons(persons.filter((p) => p.id !== id));
+  const deletePerson = (person) => {
+    if (window.confirm(`Do you really want to delete ${person.name}?`)) {
+      personService.deleteById(person.id);
+      setPersons(persons.filter((p) => p.id !== person.id));
     }
   };
 
