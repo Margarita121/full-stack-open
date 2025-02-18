@@ -4,11 +4,31 @@ import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
 import personService from "./services/persons";
 
+//merge together notifciation and error, separate them only by style?
+
+const Notification = ({ message }) => {
+  if (message == null) {
+    return null;
+  }
+
+  return <div className="notification">{message}</div>;
+};
+
+const Error = ({ message }) => {
+  if (message == null) {
+    return null;
+  }
+
+  return <div className="error">{message}</div>;
+};
+
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newFilter, setNewFilter] = useState("");
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  const [notification, setNotification] = useState();
+  const [error, setError] = useState();
 
   useEffect(() => {
     personService.getAll().then((initialPersons) => {
@@ -47,11 +67,18 @@ const App = () => {
                 p.id === existingPerson.id ? returnedPerson : p
               )
             );
+            setNotification(`Updated '${personObject.name}'`);
+            setTimeout(() => {
+              setNotification(null);
+            }, 5000);
           })
           .catch((error) => {
-            alert(
-              `the person '${existingPerson.content}' was already deleted from server`
+            setError(
+              `Information of '${personObject.name}' has already been removed form server`
             );
+            setTimeout(() => {
+              setError(null);
+            }, 5000);
             setPersons(persons.filter((p) => p.id !== existingPerson.id));
           });
       }
@@ -59,6 +86,10 @@ const App = () => {
       personService.create(personObject).then((returnedPerson) => {
         setPersons(persons.concat(returnedPerson));
       });
+      setNotification(`Added '${personObject.name}'`);
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     }
     setNewName("");
     setNewNumber("");
@@ -92,6 +123,8 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={notification} />
+      <Error message={error} />
       <Filter value={newFilter} onChange={handleInputFilterChange} />
       <h2>Add a new contact</h2>
       <PersonForm

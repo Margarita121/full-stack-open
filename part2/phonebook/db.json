@@ -2,7 +2,7 @@
   "persons": [
     {
       "name": "Arto Hellas",
-      "number": "111222",
+      "number": "123",
       "id": "1"
     },
     {
@@ -21,19 +21,14 @@
       "id": "4"
     },
     {
-      "id": 5,
+      "id": "5",
       "name": "new name",
       "number": "123"
     },
     {
-      "id": 6,
+      "id": "6",
       "name": "aaaa bbb",
       "number": "123"
-    },
-    {
-      "id": 7,
-      "name": "aaa bbb",
-      "number": "123445555"
     }
   ]
 }
