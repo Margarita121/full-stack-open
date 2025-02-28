@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import countriesService from "./services/countries";
 import CountryInfo from "./components/CountryInfo";
+import DisplayCountriesList from "./components/DisplayCountriesList";
 
 const App = () => {
   const [inputCountry, setInputCountry] = useState("");
@@ -61,9 +62,7 @@ const App = () => {
         find countries{" "}
         <input value={inputCountry} onChange={handleCountryChange} />
       </form>
-      {display.map((el) => (
-        <div key={el}> {el} </div>
-      ))}
+      <DisplayCountriesList input={display} getCountryInfo={getCountryInfo}/>
       <CountryInfo info={countryInfo} />
     </div>
   );
