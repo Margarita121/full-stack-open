@@ -1,12 +1,15 @@
 import { useState, useEffect } from "react";
 import countriesService from "./services/countries";
+import weatherService from "./services/weather";
 import CountryInfo from "./components/CountryInfo";
+import Weather from "./components/Weather";
 import DisplayCountriesList from "./components/DisplayCountriesList";
 
 const App = () => {
   const [inputCountry, setInputCountry] = useState("");
   const [display, setDisplay] = useState([]);
   const [countryInfo, setCountryInfo] = useState(null);
+  const [weather, setWeather] = useState(null);
   var countriesMatchingFilter = [];
 
   const titleCase = (str) =>
@@ -14,7 +17,6 @@ const App = () => {
 
   useEffect(() => {
     if (countryInfo) {
-      console.log("EFFECT RUN - One country selected");
       setCountryInfo(countryInfo);
     }
   }, [inputCountry]);
@@ -22,6 +24,13 @@ const App = () => {
   const getCountryInfo = (inputCountry) => {
     countriesService.getCountryByName(titleCase(inputCountry)).then((info) => {
       setCountryInfo(info);
+      getWeatherInfo(info);
+      return info;
+    });
+  };
+  const getWeatherInfo = (countryInfo) => {
+    weatherService.getWeatherInCapital(countryInfo).then((info) => {
+      setWeather(info);
       return info;
     });
   };
@@ -45,8 +54,6 @@ const App = () => {
       countriesMatchingFilter = allNames.filter((name) =>
         name.toLowerCase().includes(inputCountry.toLowerCase())
       );
-      console.log("FILTER - countries matching filter");
-      console.log(countriesMatchingFilter);
       displayCountries(countriesMatchingFilter);
     });
   };
@@ -62,8 +69,9 @@ const App = () => {
         find countries{" "}
         <input value={inputCountry} onChange={handleCountryChange} />
       </form>
-      <DisplayCountriesList input={display} getCountryInfo={getCountryInfo}/>
+      <DisplayCountriesList input={display} getCountryInfo={getCountryInfo} />
       <CountryInfo info={countryInfo} />
+      <Weather info={countryInfo} weather={weather} />
     </div>
   );
 };

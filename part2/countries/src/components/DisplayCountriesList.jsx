@@ -5,9 +5,9 @@ const DisplayCountriesList = ({ input, getCountryInfo }) => {
     return (
       <div>
         {input.map((el) => (
-          <div key={el}> 
-          {el} <button onClick={() => getCountryInfo(el)}>Show</button>
-           </div>
+          <div key={el}>
+            {el} <button onClick={() => getCountryInfo(el)}>Show</button>
+          </div>
         ))}
       </div>
     );
