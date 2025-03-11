@@ -3,6 +3,7 @@ var morgan = require("morgan");
 const app = express();
 
 app.use(express.json());
+app.use(express.static('dist'))
 
 morgan.token("data", function (req, res) {
   return JSON.stringify(req.body);
