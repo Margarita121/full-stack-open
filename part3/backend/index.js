@@ -1,8 +1,10 @@
 const express = require("express");
 const app = express();
-const cors = require('cors')
+// const cors = require('cors')
 
-app.use(cors())
+//use 'npm remove cors' to remove
+
+// app.use(cors())
 app.use(express.json());
 app.use(express.static('dist'))
 
