@@ -74,7 +74,7 @@ const App = () => {
           })
           .catch((error) => {
             setError(
-              `Information of '${personObject.name}' has already been removed form server`
+              `Information of '${personObject.name}' has already been removed from server`
             );
             setTimeout(() => {
               setError(null);
@@ -83,13 +83,22 @@ const App = () => {
           });
       }
     } else {
-      personService.create(personObject).then((returnedPerson) => {
-        setPersons(persons.concat(returnedPerson));
-      });
-      setNotification(`Added '${personObject.name}'`);
-      setTimeout(() => {
-        setNotification(null);
-      }, 5000);
+      personService
+        .create(personObject)
+        .then((returnedPerson) => {
+          setPersons(persons.concat(returnedPerson));
+          setNotification(`Added '${personObject.name}'`);
+          setTimeout(() => {
+            setNotification(null);
+          }, 5000);
+        })
+        .catch((error) => {
+          console.log(error.response.data.error);
+          setError(error.response.data.error);
+          setTimeout(() => {
+            setError(null);
+          }, 5000);
+        });
     }
     setNewName("");
     setNewNumber("");
