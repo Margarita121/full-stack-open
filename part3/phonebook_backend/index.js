@@ -57,7 +57,8 @@ app.put("/api/persons/:id", (request, response, next) => {
 
       return person.save().then((updatedPerson) => {
         response.json(updatedPerson);
-      });
+      })
+      .catch((error) => next(error))
     })
     .catch((error) => next(error));
 });
