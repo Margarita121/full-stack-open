@@ -47,8 +47,6 @@ const App = () => {
     const existingPerson = persons.find((p) => p.name === personObject.name);
     // if person is already added there is option to update number
     if (existingPerson) {
-      console.log(`There is existing person ${existingPerson.name}`);
-      console.log(`updated number ${personObject.number}`);
       if (
         window.confirm(
           `${existingPerson.name} is already added to phonebook, replace the old number with a new one?`

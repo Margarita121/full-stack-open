@@ -73,13 +73,11 @@ const App = () => {
             }, 5000);
           })
           .catch((error) => {
-            setError(
-              `Information of '${personObject.name}' has already been removed from server`
-            );
+            setError(error.response.data.error);
             setTimeout(() => {
               setError(null);
             }, 5000);
-            setPersons(persons.filter((p) => p.id !== existingPerson.id));
+            // setPersons(persons.filter((p) => p.id !== existingPerson.id));
           });
       }
     } else {
