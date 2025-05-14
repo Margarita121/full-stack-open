@@ -64,6 +64,7 @@ describe('viewing a specific note', () => {
 
 describe('addition of a new note', () => {
 test('succeeds with valid data ', async () => {
+  //doesn't work now that notes specify user id
     const newNote = {
       content: 'async/await simplifies making async calls',
       important: true,
