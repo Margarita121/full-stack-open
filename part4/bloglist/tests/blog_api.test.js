@@ -7,31 +7,65 @@ const app = require('../app')
 const helper = require('./test_helper')
 const initialBlogs = require('./blogs')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const api = supertest(app)
 
 describe('when there is initially some blogs saved', () => {
+  let loginResponse = ''
   beforeEach(async () => {
+    //first delete previous blogs and users
     await Blog.deleteMany({})
+    await User.deleteMany({})
+
+    //then create new user
+    const newUser = {
+      username: 'test',
+      name: 'Test User',
+      password: 'password',
+    }
+
+    const newUserResponse = await api
+      .post('/api/users')
+      .send(newUser)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    delete newUser.name
+
+    //then login as new user and save the token
+    loginResponse = await api
+      .post('/api/login')
+      .send(newUser)
+      .expect(200)
+
+    //add user id field to each of the blogs
+    initialBlogs.map((blog => blog.user = newUserResponse.body.id))
+
     await Blog.insertMany(initialBlogs)
   })
 
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.body.token}` )
       .expect(200)
       .expect('Content-Type', /application\/json/)
   })
 
   test('all blogs are returned', async () => {
-    const response = await api.get('/api/blogs')
+    const response = await api
+      .get('/api/blogs')
+      .set('Authorization', `Bearer ${loginResponse.body.token}` )
 
     assert.strictEqual(response.body.length, initialBlogs.length)
   })
 
   describe('viewing a specific note', () => {
     test('blog contains id field', async () => {
-      const response = await api.get('/api/blogs')
+      const response = await api
+        .get('/api/blogs')
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
       const firstBlog = response.body[0]
 
       assert.strictEqual(Object.hasOwn(firstBlog, 'id'), true)
@@ -48,6 +82,7 @@ describe('when there is initially some blogs saved', () => {
       }
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -71,6 +106,7 @@ describe('when there is initially some blogs saved', () => {
       }
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/)
@@ -95,6 +131,7 @@ describe('when there is initially some blogs saved', () => {
       }
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
         .send(newBlog)
         .expect(400)
 
@@ -108,6 +145,7 @@ describe('when there is initially some blogs saved', () => {
       }
       await api
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
         .send(newBlog)
         .expect(400)
 
@@ -122,6 +160,7 @@ describe('when there is initially some blogs saved', () => {
       blogToUpdate.likes = 2
       await api
         .put(`/api/blogs/${blogToUpdate.id}`)
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
         .send(blogToUpdate)
         .expect(200)
         .expect('Content-Type', /application\/json/)
@@ -140,6 +179,7 @@ describe('when there is initially some blogs saved', () => {
 
       await api
         .delete(`/api/blogs/${blogToDelete.id}`)
+        .set('Authorization', `Bearer ${loginResponse.body.token}` )
         .expect(204)
 
       const blogsAtEnd = await helper.blogsInDb()
