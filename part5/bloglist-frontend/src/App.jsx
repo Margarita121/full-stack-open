@@ -1,16 +1,22 @@
 import { useState, useEffect } from 'react'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import Error from './components/Error'
 import LoginForm from './components/LoginForm'
+import BlogForm from './components/BlogForm'
 import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
+  const [notifMessage, setNotifMessage] = useState(null)
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
   const [user, setUser] = useState(null)
+  const [title, setTitle] = useState('') 
+  const [author, setAuthor] = useState('')
+  const [url, setUrl] = useState('') 
 
   useEffect(() => {
     if (user){
@@ -57,9 +63,32 @@ const App = () => {
       window.location.reload()
     }
 
+    const addBlog = async (event) => {
+      event.preventDefault()
+      const blogObject = {
+            title: title,
+            author: author,
+            url: url
+          }
+        
+          blogService
+            .create(blogObject)
+              .then(returnedBlog => {
+              setBlogs(blogs.concat(returnedBlog))
+              setTitle('')
+              setAuthor('')
+              setUrl('')
+              setNotifMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+              setTimeout(() => {
+                setNotifMessage(null)
+              }, 5000)
+            })
+    }
+
   return (
     <div>
-      <Notification message={errorMessage} />
+      <Error message={errorMessage} />
+      <Notification message={notifMessage} />
       { user === null ?
       <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} /> :
       <div>
@@ -67,6 +96,7 @@ const App = () => {
         <p>
           {user.name} logged-in <button onClick={handleLogout}>logout</button>
         </p> 
+        <BlogForm addBlog={addBlog} title={title} setTitle={setTitle} author={author} setAuthor={setAuthor} url={url} setUrl={setUrl}/> 
         {blogs.map(blog =>
         <Blog key={blog.id} blog={blog} />
         )}
