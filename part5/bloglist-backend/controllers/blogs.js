@@ -38,7 +38,9 @@ blogsRouter.put('/:id', async (request, response) => {
   const blogToUpdate = await Blog.findById(request.params.id)
   if (blogToUpdate) {
     blogToUpdate.likes = likes
-    const savedBlog = await blogToUpdate.save()
+    const user = request.user
+    let savedBlog = await blogToUpdate.save()
+    savedBlog.user = user
     response.status(200).json(savedBlog)
   } else {
     console.log('no blog with specified id found')

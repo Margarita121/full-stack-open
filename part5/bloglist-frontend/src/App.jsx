@@ -22,7 +22,7 @@ const App = () => {
     if (user){
       blogService.getAll().then(blogs =>
       setBlogs( blogs )
-    )  
+      )
     }
   }, [user])
 
@@ -76,6 +76,14 @@ const App = () => {
             })
     }
 
+    const updateBlog = async (blogId, blogObject) => {
+          blogService
+            .update(blogId, blogObject)
+              .then(returnedBlog => {
+              setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
+            })
+    }
+
     const blogForm = () => {
       return (
       <div>
@@ -103,7 +111,7 @@ const App = () => {
         </p>
         {blogForm()}
         {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
         )}
       </div>
     }
