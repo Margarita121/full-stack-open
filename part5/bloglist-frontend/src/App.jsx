@@ -21,7 +21,7 @@ const App = () => {
   useEffect(() => {
     if (user){
       blogService.getAll().then(blogs =>
-      setBlogs( blogs )
+        setBlogs( blogs )
       )
     }
   }, [user])
@@ -84,6 +84,14 @@ const App = () => {
             })
     }
 
+    const removeBlog = async (blog) => {
+      if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+        blogService
+            .remove(blog.id)
+            window.location.reload()
+        }
+        }
+
     const blogForm = () => {
       return (
       <div>
@@ -110,8 +118,8 @@ const App = () => {
           {user.name} logged-in <button onClick={handleLogout}>logout</button>
         </p>
         {blogForm()}
-        {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} />
+        {blogs.sort((secondItem, firstItem) => firstItem.likes - secondItem.likes).map(blog =>
+        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} user={user} removeBlog={removeBlog}/>
         )}
       </div>
     }

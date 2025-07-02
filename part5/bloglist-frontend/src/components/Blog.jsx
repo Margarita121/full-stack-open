@@ -1,7 +1,7 @@
 import { useState } from 'react'
 
 /* eslint-disable react/prop-types */
-const Blog = ({ blog, updateBlog }) => {
+const Blog = ({ blog, updateBlog, user, removeBlog }) => {
   const [blogDetailsVisible, setBlogDetailsVisible] = useState(false)
 
   const hideWhenVisible = { display: blogDetailsVisible ? 'none' : '' }
@@ -22,7 +22,6 @@ const Blog = ({ blog, updateBlog }) => {
     <div className="blog">
         <div style={hideWhenVisible}>
           {blog.title} {blog.author} 
-          
           <button onClick={() => setBlogDetailsVisible(true)}>view</button>
         </div>
         <div style={showWhenVisible}>
@@ -31,7 +30,8 @@ const Blog = ({ blog, updateBlog }) => {
           {blog.url} <br/>
           likes {blog.likes} 
           <button onClick={updateLikes}>like</button> <br/>
-          {blog.user.name}
+          {blog.user.name} <br/>
+          {user.username === blog.user.username ? <button className="blueButton" onClick={() => removeBlog(blog)}>remove </button> : "" }
         </div>
       </div>  
   )

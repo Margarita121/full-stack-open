@@ -36,3 +36,8 @@ h1 {
   border-width: 1;
   margin-bottom: 5;
 }
+
+.blueButton {
+  border-radius: 4px;
+  background-color: #008CBA;
+}
