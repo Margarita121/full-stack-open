@@ -1,5 +1,5 @@
 /* eslint-disable react/display-name */
-/* eslint-disable react/prop-types */
+
 import { useState, forwardRef, useImperativeHandle } from 'react'
 
 const Togglable = forwardRef((props, refs) => {

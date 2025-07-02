@@ -12,8 +12,8 @@ const App = () => {
   const [blogs, setBlogs] = useState([])
   const [errorMessage, setErrorMessage] = useState(null)
   const [notifMessage, setNotifMessage] = useState(null)
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
 
   const blogFormRef = useRef()
@@ -36,64 +36,64 @@ const App = () => {
   }, [])
 
   const handleLogin = async (event) => {
-      event.preventDefault()
-      
-      try {
-        const user = await loginService.login({
-          username, password,
-        })
-        window.localStorage.setItem(
-          'loggedBlogappUser', JSON.stringify(user)
-        ) 
-        blogService.setToken(user.token)
-        setUser(user)
-        setUsername('')
-        setPassword('')
-      } catch (exception) {
-        setErrorMessage('Wrong credentials')
-        console.log(exception)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 5000)
-      }
-    }
+    event.preventDefault()
 
-    const handleLogout = async () => {
-      window.localStorage.removeItem('loggedBlogappUser')
+    try {
+      const user = await loginService.login({
+        username, password,
+      })
+      window.localStorage.setItem(
+        'loggedBlogappUser', JSON.stringify(user)
+      )
+      blogService.setToken(user.token)
+      setUser(user)
+      setUsername('')
+      setPassword('')
+    } catch (exception) {
+      setErrorMessage('Wrong credentials')
+      console.log(exception)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
+    }
+  }
+
+  const handleLogout = async () => {
+    window.localStorage.removeItem('loggedBlogappUser')
+    window.location.reload()
+  }
+
+  const addBlog = async (blogObject) => {
+    blogFormRef.current.toggleVisibility()
+    blogService
+      .create(blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.concat(returnedBlog))
+        setNotifMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
+        setTimeout(() => {
+          setNotifMessage(null)
+        }, 5000)
+      })
+  }
+
+  const updateBlog = async (blogId, blogObject) => {
+    blogService
+      .update(blogId, blogObject)
+      .then(returnedBlog => {
+        setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
+      })
+  }
+
+  const removeBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      blogService
+        .remove(blog.id)
       window.location.reload()
     }
+  }
 
-    const addBlog = async (blogObject) => {
-      blogFormRef.current.toggleVisibility()
-          blogService
-            .create(blogObject)
-              .then(returnedBlog => {
-              setBlogs(blogs.concat(returnedBlog))
-              setNotifMessage(`a new blog ${returnedBlog.title} by ${returnedBlog.author} added`)
-              setTimeout(() => {
-                setNotifMessage(null)
-              }, 5000)
-            })
-    }
-
-    const updateBlog = async (blogId, blogObject) => {
-          blogService
-            .update(blogId, blogObject)
-              .then(returnedBlog => {
-              setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
-            })
-    }
-
-    const removeBlog = async (blog) => {
-      if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
-        blogService
-            .remove(blog.id)
-            window.location.reload()
-        }
-        }
-
-    const blogForm = () => {
-      return (
+  const blogForm = () => {
+    return (
       <div>
         <div>
           <Togglable buttonLabel="create new blog" ref={blogFormRef} >
@@ -104,25 +104,25 @@ const App = () => {
         </div>
       </div>
     )
-    }
+  }
 
   return (
     <div>
       <Error message={errorMessage} />
       <Notification message={notifMessage} />
       { user === null ?
-      <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} /> :
-      <div>
-        <h2>blogs</h2>
-        <p>
-          {user.name} logged-in <button onClick={handleLogout}>logout</button>
-        </p>
-        {blogForm()}
-        {blogs.sort((secondItem, firstItem) => firstItem.likes - secondItem.likes).map(blog =>
-        <Blog key={blog.id} blog={blog} updateBlog={updateBlog} user={user} removeBlog={removeBlog}/>
-        )}
-      </div>
-    }
+        <LoginForm handleLogin={handleLogin} username={username} setUsername={setUsername} password={password} setPassword={setPassword} /> :
+        <div>
+          <h2>blogs</h2>
+          <p>
+            {user.name} logged-in <button onClick={handleLogout}>logout</button>
+          </p>
+          {blogForm()}
+          {blogs.sort((secondItem, firstItem) => firstItem.likes - secondItem.likes).map(blog =>
+            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} user={user} removeBlog={removeBlog}/>
+          )}
+        </div>
+      }
     </div>
   )
 }

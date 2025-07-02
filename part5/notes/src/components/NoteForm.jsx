@@ -1,7 +1,6 @@
 import { useState } from 'react'
 
-// eslint-disable-next-line react/prop-types
-const NoteForm = ({ createNote}) => {
+const NoteForm = ({ createNote }) => {
   const [newNote, setNewNote] = useState('')
   const addNote = (event) => {
     event.preventDefault()
