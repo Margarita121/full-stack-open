@@ -26,6 +26,8 @@ module.exports = defineConfig([{
   languageOptions: {
     globals: {
       ...globals.browser,
+      ...globals.jest,
+      ...globals.vitest
     },
 
     ecmaVersion: 'latest',

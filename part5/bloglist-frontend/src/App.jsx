@@ -76,13 +76,16 @@ const App = () => {
       })
   }
 
-  const updateBlog = async (blogId, blogObject) => {
+  const updateLikes = async (blogObject) => {
+    const likesForUpdate = { likes: blogObject.likes + 1 }
+
     blogService
-      .update(blogId, blogObject)
+      .update(blogObject.id, likesForUpdate)
       .then(returnedBlog => {
-        setBlogs(blogs.map(blog => blog.id !== blogId ? blog : returnedBlog))
+        setBlogs(blogs.map(blog => blog.id !== blogObject.id ? blog : returnedBlog))
       })
   }
+
 
   const removeBlog = async (blog) => {
     if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
@@ -119,7 +122,7 @@ const App = () => {
           </p>
           {blogForm()}
           {blogs.sort((secondItem, firstItem) => firstItem.likes - secondItem.likes).map(blog =>
-            <Blog key={blog.id} blog={blog} updateBlog={updateBlog} user={user} removeBlog={removeBlog}/>
+            <Blog key={blog.id} blog={blog} updateLikes={updateLikes} user={user} removeBlog={removeBlog}/>
           )}
         </div>
       }

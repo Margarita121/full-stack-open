@@ -31,17 +31,16 @@ blogsRouter.delete('/:id', async (request, response) => {
   } else {
     return response.status(400).json({ error: 'UserId associated with blog is not matching with current user' })
   }
-
 })
 
-blogsRouter.put('/:id', async (request, response) => {
+blogsRouter.patch('/:id', async (request, response) => {
   const { likes } = request.body
-  const blogToUpdate = await Blog.findById(request.params.id)
+  let blogToUpdate = await Blog.findById(request.params.id)
   if (blogToUpdate) {
     blogToUpdate.likes = likes
-    const user = request.user
-    let savedBlog = await blogToUpdate.save()
-    savedBlog.user = user
+    await blogToUpdate.save()
+    const populatedBlog = await Blog.find(blogToUpdate).populate('user', { username: 1, name: 1 })
+    const savedBlog = await populatedBlog[0].save()
     response.status(200).json(savedBlog)
   } else {
     console.log('no blog with specified id found')
