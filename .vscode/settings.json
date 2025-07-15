@@ -1,4 +1,3 @@
 {
-    "prettier.embeddedLanguageFormatting": "off",
-    "prettier.enable": false
+    "editor.tabSize": 2
 }
