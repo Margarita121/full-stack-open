@@ -7,7 +7,7 @@
     },
     {
       "content": "state changes are made with actions",
-      "important": false,
+      "important": true,
       "id": "2"
     },
     {
@@ -17,6 +17,16 @@
     },
     {
       "id": "e300",
+      "content": "new",
+      "important": false
+    },
+    {
+      "id": "e792",
+      "content": "test",
+      "important": true
+    },
+    {
+      "id": "cc06",
       "content": "new",
       "important": false
     }
