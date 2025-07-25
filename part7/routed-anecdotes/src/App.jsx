@@ -3,6 +3,7 @@ import { useState } from 'react'
 import {
   Routes, Route, Link, useMatch, useNavigate
 } from 'react-router-dom'
+import  { useField } from './hooks'
 
 const Menu = () => {
   const padding = {
@@ -17,7 +18,6 @@ const Menu = () => {
       <Link style={padding} to="/about">about</Link>
       </div>
     </div>
-    
   )
 }
 
@@ -70,39 +70,50 @@ const Footer = () => (
 )
 
 const CreateNew = (props) => {
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [info, setInfo] = useState('')
+  //extracts onReset from returned object and renames to onContentReset, puts the rest of properties in a new object "content"
+  const { onReset : onContentReset, ...content} = useField("text")
+  const { onReset : onAuthorReset, ...author}  = useField("text")
+  const { onReset : onInfoReset, ...info}  = useField("text")
   const navigate = useNavigate()
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    props.addNew({
-      content,
-      author,
-      info,
+    const newAnecdote = {
+      content: content.value,
+      author: author.value,
+      info: info.value,
       votes: 0
-    })
+    }
+    props.addNew(newAnecdote)
     navigate('/anecdotes')
   }
+
+  const handleReset = (e) => {
+    e.preventDefault()
+    onContentReset()
+    onAuthorReset()
+    onInfoReset()
+  }
+
 
   return (
     <div>
       <h2>create a new anecdote</h2>
-      <form onSubmit={handleSubmit} >
+      <form >
         <div>
           content
-          <input name='content' value={content} onChange={(e) => setContent(e.target.value)} />
+          <input name='content' {...content} />
         </div>
         <div>
           author
-          <input name='author' value={author} onChange={(e) => setAuthor(e.target.value)} />
+          <input name='author' {...author} />
         </div>
         <div>
           url for more info
-          <input name='info' value={info} onChange={(e)=> setInfo(e.target.value)} />
+          <input name='info' {...info} />
         </div>
-        <button>create</button>
+        <button onClick={handleSubmit}>create</button>
+        <button onClick={handleReset}>reset</button>
       </form>
     </div>
   )
@@ -156,6 +167,7 @@ const App = () => {
 
     setAnecdotes(anecdotes.map(a => a.id === id ? voted : a))
   }
+  
 
   return (
     <div>
