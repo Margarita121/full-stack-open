@@ -1,0 +1,51 @@
+const blogsRouter = require('express').Router()
+const Blog = require('../models/blog')
+
+blogsRouter.get('/', async (request, response) => {
+  const blogs = await Blog
+    .find({}).populate('user', { username: 1, name: 1 })
+  response.json(blogs)
+})
+
+blogsRouter.post('/', async (request, response) => {
+  const blog = new Blog(request.body)
+
+  const user = request.user
+  blog.user = user._id
+
+  let savedBlog = await blog.save()
+  savedBlog.user = user
+  user.blogs = user.blogs.concat(savedBlog._id)
+  await user.save()
+  response.status(201).json(savedBlog)
+})
+
+blogsRouter.delete('/:id', async (request, response) => {
+  const user = request.user
+  const blog = await Blog.findById(request.params.id)
+  if (!blog){
+    return response.status(400).json({ error: 'BlogId is not valid' })
+  } else if ( blog.user.toString() === user.id.toString() ){
+    await Blog.findByIdAndDelete(request.params.id)
+    response.status(204).end()
+  } else {
+    return response.status(400).json({ error: 'UserId associated with blog is not matching with current user' })
+  }
+})
+
+blogsRouter.patch('/:id', async (request, response) => {
+  const { likes } = request.body
+  let blogToUpdate = await Blog.findById(request.params.id)
+  if (blogToUpdate) {
+    blogToUpdate.likes = likes
+    await blogToUpdate.save()
+    const populatedBlog = await Blog.find(blogToUpdate).populate('user', { username: 1, name: 1 })
+    const savedBlog = await populatedBlog[0].save()
+    response.status(200).json(savedBlog)
+  } else {
+    console.log('no blog with specified id found')
+    response.status(404).end()
+  }
+})
+
+module.exports = blogsRouter
