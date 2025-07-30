@@ -1,22 +1,34 @@
 import { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { showNotificationWithTimeout } from '../reducers/notificationReducer'
+import { removeBlog, updateLikes } from '../reducers/blogReducer'
 
-const Blog = ({ blog, updateLikes, user, removeBlog }) => {
+const Blog = ({ blog }) => {
   const [blogDetails, setBlogDetails] = useState(false)
   const dispatch = useDispatch()
+
+  const user = useSelector(({ user }) => {
+    return user
+  })
 
   const toggleVisibility = () => {
     setBlogDetails(!blogDetails)
   }
 
   const onClickLike = (blog) => {
-    updateLikes(blog)
+    dispatch(updateLikes(blog))
     dispatch(showNotificationWithTimeout(`You liked ${blog.title}`, 2))
-  }  
+  }
+
+  const deleteBlog = async (blog) => {
+    if (window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) {
+      dispatch(removeBlog(blog.id))
+      window.location.reload()
+    }
+  }
 
   return (
-    <div className="blog">
+    <div className="blog" key={blog.id}>
       <div>
         {blog.title} {blog.author} {''}
         <button onClick={() => toggleVisibility()}>
@@ -33,7 +45,7 @@ const Blog = ({ blog, updateLikes, user, removeBlog }) => {
           <div>{blog.user.name}</div>
           {blog.user.username === user.username && (
             <div>
-              <button className="blueButton" onClick={() => removeBlog(blog)}>
+              <button className="blueButton" onClick={() => deleteBlog(blog)}>
                 remove
               </button>
             </div>
