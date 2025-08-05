@@ -8,7 +8,10 @@ import { useUserValue } from '../contexts/UserContext'
 
 const BlogList = () => {
   const blogFormRef = useRef()
-  const user = useUserValue()
+  const loggedInUser = useUserValue()
+  if (!loggedInUser) {
+    return <div>Please login first</div>
+  }
 
   const result = useQuery({
     queryKey: ['blogs'],
@@ -25,11 +28,6 @@ const BlogList = () => {
 
   const blogs = result.data
 
-  const handleLogout = async () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    window.location.reload()
-  }
-
   const blogForm = () => {
     return (
       <div>
@@ -42,17 +40,23 @@ const BlogList = () => {
     )
   }
 
+  const BlogListItem = ({blog}) => {
+    return (
+        <div>
+          {/* <Link to={`/blogs/${blog.id}`}> {blog.title} {blog.author}  </Link> */}
+          {blog.title} {blog.author}
+        </div>  
+    )
+  }
+
   return (
     <div>
       <h2>blogs</h2>
-      <p>
-        {user.name} logged-in <button onClick={handleLogout}>logout</button>
-      </p>
       {blogForm()}
       {[...blogs]
         .sort((secondItem, firstItem) => firstItem.likes - secondItem.likes)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+          <BlogListItem key={blog.id} blog={blog}/> 
         ))}
     </div>
   )

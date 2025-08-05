@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom'
 import { useField } from '../hooks'
 import { useUserDispatch } from '../contexts/UserContext'
 import loginService from '../services/login'
@@ -8,6 +9,7 @@ const LoginForm = () => {
   const { onReset: resetPassword, ...password } = useField('text')
 
   const userDispatch = useUserDispatch()
+  const navigate = useNavigate()
   
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -20,6 +22,7 @@ const LoginForm = () => {
     )
     resetUsername()
     resetPassword()
+    navigate('/blogs')
   }
 
   return (

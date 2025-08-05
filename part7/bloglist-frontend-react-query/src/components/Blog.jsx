@@ -1,18 +1,27 @@
-import { useState } from 'react'
+// import { useState } from 'react'
+// import { useParams } from 'react-router-dom'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useNotificationDispatch } from '../contexts/NotificationContext'
 import { useUserValue } from '../contexts/UserContext'
 import blogService from '../services/blogs'
 
-const Blog = ({ blog }) => {
-  const [blogDetails, setBlogDetails] = useState(false)
+const Blog = ({ blogs }) => {
+  // const [blogDetails, setBlogDetails] = useState(false)
   const notificationDispatch = useNotificationDispatch()
 
   const user = useUserValue()
-
-  const toggleVisibility = () => {
-    setBlogDetails(!blogDetails)
+  const id = useParams().id
+  const blog = blogs.find(blog =>
+     blog.id === id,
+    )
+  if (!blogs) {
+    console.log('no blogs')
+    return null
   }
+
+  // const toggleVisibility = () => {
+  //   setBlogDetails(!blogDetails)
+  // }
 
   const queryClient =  useQueryClient() 
   const likeBlogMutation = useMutation({
@@ -48,15 +57,9 @@ const Blog = ({ blog }) => {
   }
 
   return (
-    <div className="blog" key={blog.id}>
-      <div>
-        {blog.title} {blog.author} {''}
-        <button onClick={() => toggleVisibility()}>
-          {blogDetails ? 'hide' : 'view'}
-        </button>
-      </div>
-      {blogDetails && (
-        <div>
+    <div className="blog">
+
+          <h1>{blog.title} {blog.author}</h1>
           <a href={blog.url}>{blog.url}</a>
           <div>
             likes {blog.likes} {''}
@@ -70,8 +73,7 @@ const Blog = ({ blog }) => {
               </button>
             </div>
           )}
-        </div>
-      )}
+
     </div>
   )
 }

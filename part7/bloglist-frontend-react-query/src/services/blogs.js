@@ -7,6 +7,10 @@ const setToken = (newToken) => {
   token = `Bearer ${newToken}`
 }
 
+const getToken = () => {
+  return token
+}
+
 const getAll = async () => {
   const config = {
     headers: { Authorization: token },
@@ -42,4 +46,4 @@ const remove = async (id) => {
   return response.data
 }
 
-export default { setToken, getAll, create, update, remove }
+export default { setToken, getToken, getAll, create, update, remove }

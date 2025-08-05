@@ -1,5 +1,6 @@
 import { useField } from '../hooks'
 import { useNotificationDispatch } from '../contexts/NotificationContext'
+import { useUserValue } from '../contexts/UserContext'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import blogService from '../services/blogs'
 
@@ -40,6 +41,11 @@ const BlogForm = ({ blogFormRef }) => {
 
     blogFormRef.current.toggleVisibility()
   }
+
+  const loggedInUser = useUserValue()
+    if (!loggedInUser) {
+      return <div>Please login first</div>
+    }
 
   return (
     <form onSubmit={addBlog}>
