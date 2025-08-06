@@ -1,3 +1,12 @@
+import styled from 'styled-components'
+
+const Page = styled.div`
+  padding: 1em;
+  background: papayawhip;
+  border-style: solid;
+  border-width: 1;
+`
+
 const User = ({ user }) => {
   if (!user) {
     console.log('no user')
@@ -5,7 +14,7 @@ const User = ({ user }) => {
   }
 
   return (
-    <div>
+    <Page>
       <h2>{user.name}</h2>
       <h3>added blogs</h3>
       <ul>
@@ -13,7 +22,7 @@ const User = ({ user }) => {
           <li key={blog.id}>{blog.title}</li>
         ))}
       </ul>
-    </div>
+    </Page>
   )
 }
 

@@ -1,13 +1,19 @@
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+
+const CustomNotification = styled.div`
+  padding: 1em;
+  font-size: 1em;
+  background: mistyrose;
+`
 
 const Notification = () => {
   const notification = useSelector(({ notification }) => notification.content)
-  const style = {
-    border: 'solid',
-    padding: 10,
-    borderWidth: 1,
+  if (!notification) {
+    return null
   }
-  return <div style={style}>{notification}</div>
+
+  return <CustomNotification>{notification}</CustomNotification>
 }
 
 export default Notification

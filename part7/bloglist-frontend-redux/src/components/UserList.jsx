@@ -1,5 +1,23 @@
 import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import styled from 'styled-components'
+
+const Page = styled.div`
+  padding: 1em;
+  background: papayawhip;
+  border-style: solid;
+  border-width: 1;
+`
+const Table = styled.table`
+  th,
+  td {
+    margin: 0.25em;
+  }
+  margin: 0.1em 0.25em 0.5em;
+`
+const CenterTd = styled.td`
+  text-align: center;
+`
 
 const UserList = () => {
   const users = useSelector(({ users }) => {
@@ -16,15 +34,15 @@ const UserList = () => {
         <td>
           <Link to={`/users/${user.id}`}> {user.name} </Link>{' '}
         </td>
-        <td>{user.blogs.length}</td>
+        <CenterTd>{user.blogs.length}</CenterTd>
       </tr>
     )
   }
 
   return (
-    <div>
+    <Page>
       <h2>Users</h2>
-      <table>
+      <Table>
         <tbody>
           <tr>
             <th></th>
@@ -34,8 +52,8 @@ const UserList = () => {
             <UserListItem key={user.id} user={user} />
           ))}
         </tbody>
-      </table>
-    </div>
+      </Table>
+    </Page>
   )
 }
 
