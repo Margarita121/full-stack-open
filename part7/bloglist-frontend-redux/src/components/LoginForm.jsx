@@ -1,5 +1,5 @@
 import { useDispatch } from 'react-redux'
-import { loginUser } from '../reducers/userReducer'
+import { setCurrentUser } from '../reducers/loginReducer'
 import { showNotificationWithTimeout } from '../reducers/notificationReducer'
 import { useField } from '../hooks'
 
@@ -13,7 +13,7 @@ const LoginForm = () => {
 
     try {
       dispatch(
-        loginUser({ username: username.value, password: password.value })
+        setCurrentUser({ username: username.value, password: password.value })
       )
       resetUsername()
       resetPassword()

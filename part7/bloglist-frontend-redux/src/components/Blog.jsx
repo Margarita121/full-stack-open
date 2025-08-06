@@ -1,18 +1,14 @@
-import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { showNotificationWithTimeout } from '../reducers/notificationReducer'
-import { removeBlog, updateLikes } from '../reducers/blogReducer'
+import { removeBlog, updateLikes, addNewComment } from '../reducers/blogReducer'
 
 const Blog = ({ blog }) => {
-  const [blogDetails, setBlogDetails] = useState(false)
   const dispatch = useDispatch()
+  const loggedUser = useSelector((state) => state.login)
 
-  const user = useSelector(({ user }) => {
-    return user
-  })
-
-  const toggleVisibility = () => {
-    setBlogDetails(!blogDetails)
+  if (!blog) {
+    console.log('no blog')
+    return null
   }
 
   const onClickLike = (blog) => {
@@ -27,31 +23,43 @@ const Blog = ({ blog }) => {
     }
   }
 
+  const addComment = async (event) => {
+    event.preventDefault()
+    const content = event.target.comment.value
+    dispatch(addNewComment(blog.id, content))
+    event.target.comment.value = ''
+  }
+
   return (
     <div className="blog" key={blog.id}>
+      {blog.title} {blog.author} {''}
       <div>
-        {blog.title} {blog.author} {''}
-        <button onClick={() => toggleVisibility()}>
-          {blogDetails ? 'hide' : 'view'}
-        </button>
-      </div>
-      {blogDetails && (
+        <a href={blog.url}>{blog.url}</a>
         <div>
-          <a href={blog.url}>{blog.url}</a>
-          <div>
-            likes {blog.likes} {''}
-            <button onClick={() => onClickLike(blog)}>like</button>
-          </div>
-          <div>{blog.user.name}</div>
-          {blog.user.username === user.username && (
-            <div>
-              <button className="blueButton" onClick={() => deleteBlog(blog)}>
-                remove
-              </button>
-            </div>
-          )}
+          likes {blog.likes} {''}
+          <button onClick={() => onClickLike(blog)}>like</button>
         </div>
-      )}
+        <div>{blog.user.name}</div>
+        {blog.user.username === loggedUser.username && (
+          <div>
+            <button className="blueButton" onClick={() => deleteBlog(blog)}>
+              remove
+            </button>
+          </div>
+        )}
+        <h3>comments</h3>
+        <form onSubmit={addComment}>
+          <input name="comment" />
+          <button type="submit">add comment</button>
+        </form>
+        <div>
+          <ul>
+            {blog.comments.map((comment, index) => (
+              <li key={index}>{comment}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   )
 }

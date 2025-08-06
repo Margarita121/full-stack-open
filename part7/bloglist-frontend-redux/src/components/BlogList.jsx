@@ -1,4 +1,5 @@
 import { useRef } from 'react'
+import { Link } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import Togglable from './Togglable'
 import BlogForm from './BlogForm'
@@ -10,15 +11,6 @@ const BlogList = () => {
   const blogs = useSelector(({ blogs }) => {
     return blogs
   })
-
-  const user = useSelector(({ user }) => {
-    return user
-  })
-
-  const handleLogout = async () => {
-    window.localStorage.removeItem('loggedBlogappUser')
-    window.location.reload()
-  }
 
   const blogForm = () => {
     return (
@@ -32,17 +24,27 @@ const BlogList = () => {
     )
   }
 
+  const BlogListItem = ({ blog }) => {
+    return (
+      <div>
+        <Link to={`/blogs/${blog.id}`}>
+          {' '}
+          {blog.title} {blog.author}{' '}
+        </Link>
+        {/* {blog.title} {blog.author} */}
+      </div>
+    )
+  }
+
   return (
     <div>
       <h2>blogs</h2>
-      <p>
-        {user.name} logged-in <button onClick={handleLogout}>logout</button>
-      </p>
       {blogForm()}
       {[...blogs]
         .sort((secondItem, firstItem) => firstItem.likes - secondItem.likes)
         .map((blog) => (
-          <Blog key={blog.id} blog={blog} />
+          // <Blog key={blog.id} blog={blog} />
+          <BlogListItem key={blog.id} blog={blog} />
         ))}
     </div>
   )

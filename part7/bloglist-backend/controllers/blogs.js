@@ -48,4 +48,18 @@ blogsRouter.patch('/:id', async (request, response) => {
   }
 })
 
+blogsRouter.post('/:id/comments', async (request, response) => {
+  const { comment } = request.body
+
+  let blogToUpdate = await Blog.findById(request.params.id)
+  if (blogToUpdate) {
+    blogToUpdate.comments = blogToUpdate.comments.concat(comment)
+    await blogToUpdate.save()
+    response.status(200).json(blogToUpdate )
+  } else {
+    console.log('no blog with specified id found')
+    response.status(404).end()
+  }
+})
+
 module.exports = blogsRouter

@@ -7,6 +7,10 @@ const setToken = (newToken) => {
   token = `Bearer ${newToken}`
 }
 
+const getToken = () => {
+  return token
+}
+
 const getAll = async () => {
   const config = {
     headers: { Authorization: token },
@@ -24,15 +28,6 @@ const create = async (newObject) => {
   return response.data
 }
 
-const update = async (id, newObject) => {
-  const config = {
-    headers: { Authorization: token },
-  }
-
-  const response = await axios.patch(`${baseUrl}/${id}`, newObject, config)
-  return response.data
-}
-
 const remove = async (id) => {
   const config = {
     headers: { Authorization: token },
@@ -42,4 +37,33 @@ const remove = async (id) => {
   return response.data
 }
 
-export default { setToken, getAll, create, update, remove }
+const update = async (id, newObject) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+
+  const response = await axios.patch(`${baseUrl}/${id}`, newObject, config)
+  return response.data
+}
+
+const addComment = async (id, newComment) => {
+  const config = {
+    headers: { Authorization: token },
+  }
+  const response = await axios.post(
+    `${baseUrl}/${id}/comments`,
+    newComment,
+    config
+  )
+  return response.data
+}
+
+export default {
+  setToken,
+  getToken,
+  getAll,
+  create,
+  update,
+  remove,
+  addComment,
+}
