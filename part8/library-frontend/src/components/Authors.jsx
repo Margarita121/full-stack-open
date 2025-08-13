@@ -1,8 +1,21 @@
+/* eslint-disable react/prop-types */
+import { useQuery } from '@apollo/client'
+import { ALL_AUTHORS } from "../queries"
+import BirthyearForm from './BirthyearForm'
+
 const Authors = (props) => {
+
+  const allAuthorsQueryResult = useQuery(ALL_AUTHORS, {
+    })
+
   if (!props.show) {
     return null
   }
-  const authors = []
+  
+  if (allAuthorsQueryResult.loading)  {
+      return <div>loading...</div>
+    }
+  const authors = allAuthorsQueryResult.data.allAuthors
 
   return (
     <div>
@@ -23,6 +36,7 @@ const Authors = (props) => {
           ))}
         </tbody>
       </table>
+      <BirthyearForm setError={props.notify} authors={authors}/>
     </div>
   )
 }
