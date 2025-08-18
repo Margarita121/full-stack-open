@@ -106,7 +106,7 @@ const typeDefs = `
   type Book {
     title: String!
     published: Int!
-    author: String!
+    author: Author!
     genres: [String!]!
     id: ID!
   }
@@ -179,7 +179,7 @@ const resolvers = {
       if (args.genre) {
         query.genres = args.genre
       }
-      return await Book.find(query)
+      return await Book.find(query).populate('author')
     },
     allAuthors: async () => await Author.find({}),
     me: (root, args, context) => {
@@ -214,7 +214,7 @@ const resolvers = {
         }
         const book = new Book({ ...args, author: author._id })
         await book.save()
-        return book
+        return book.populate('author')
       } catch (error) {
         throw new GraphQLError('Saving book failed', {
           extensions: {
