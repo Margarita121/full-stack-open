@@ -1,18 +1,17 @@
 /* eslint-disable react/prop-types */
-import { useQuery } from '@apollo/client'
-import { ALL_BOOKS } from "../queries"
+import { useQuery } from "@apollo/client";
+import { ALL_BOOKS } from "../queries";
 
 const Books = (props) => {
-  const allBooksQueryResult = useQuery(ALL_BOOKS, {
-    })
+  const allBooksQueryResult = useQuery(ALL_BOOKS, {});
   if (!props.show) {
-    return null
+    return null;
   }
 
-  if (allBooksQueryResult.loading)  {
-      return <div>loading...</div>
-    }
-  const books = allBooksQueryResult.data.allBooks
+  if (allBooksQueryResult.loading) {
+    return <div>loading...</div>;
+  }
+  const books = allBooksQueryResult.data.allBooks;
 
   return (
     <div>
@@ -35,7 +34,7 @@ const Books = (props) => {
         </tbody>
       </table>
     </div>
-  )
-}
+  );
+};
 
-export default Books
+export default Books;
