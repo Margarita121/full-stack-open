@@ -1,10 +1,11 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { useApolloClient } from "@apollo/client";
+import { useQuery, useApolloClient } from "@apollo/client";
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
+import { LOGGED_USER_FAV_GENRE } from "./queries";
 
 const Notify = ({ errorMessage }) => {
   if (!errorMessage) {
@@ -14,9 +15,11 @@ const Notify = ({ errorMessage }) => {
 };
 
 const App = () => {
+  const userFavGenreQueryResult = useQuery(LOGGED_USER_FAV_GENRE, {});
   const [token, setToken] = useState(null);
   const [page, setPage] = useState("authors");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [genreToSearch, setGenreToSearch] = useState(null);
   const client = useApolloClient();
 
   useEffect(() => {
@@ -40,19 +43,40 @@ const App = () => {
     setPage("authors");
   };
 
+  if (userFavGenreQueryResult.loading) {
+    return <div>loading...</div>;
+  }
+
+  const loggedUserFavGenre = userFavGenreQueryResult.data.me.favoriteGenre;
+
+  const onClickRecommend = () => {
+    setGenreToSearch(loggedUserFavGenre);
+    setPage("books");
+  };
+
+  const onClickBooks = () => {
+    setGenreToSearch(null);
+    setPage("books");
+  };
+
   return (
     <div>
       <Notify errorMessage={errorMessage} />
       <div>
         <button onClick={() => setPage("authors")}>authors</button>
-        <button onClick={() => setPage("books")}>books</button>
+        <button onClick={onClickBooks}>books</button>
+        <button onClick={onClickRecommend}>recommend</button>
         {token && <button onClick={() => setPage("add")}>add book</button>}
         {token && <button onClick={logout}>logout</button>}
         {!token && <button onClick={() => setPage("login")}>login</button>}
       </div>
 
       <Authors show={page === "authors"} token={token} setError={notify} />
-      <Books show={page === "books"} />
+      <Books
+        show={page === "books"}
+        genreToSearch={genreToSearch}
+        setGenreToSearch={setGenreToSearch}
+      />
       <NewBook show={page === "add"} setError={notify} />
       <LoginForm
         show={page === "login"}

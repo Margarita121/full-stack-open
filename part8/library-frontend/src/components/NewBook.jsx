@@ -1,7 +1,7 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
-import { ALL_AUTHORS, ALL_BOOKS, CREATE_BOOK } from "../queries";
+import { gql, useMutation } from "@apollo/client";
+import { CREATE_BOOK } from "../queries";
 
 const NewBook = (props) => {
   const [title, setTitle] = useState("");
@@ -11,10 +11,69 @@ const NewBook = (props) => {
   const [genres, setGenres] = useState([]);
 
   const [createBook] = useMutation(CREATE_BOOK, {
-    refetchQueries: [{ query: ALL_BOOKS }, { query: ALL_AUTHORS }],
     onError: (error) => {
       const messages = error.graphQLErrors.map((e) => e.message).join("\n");
       props.setError(messages);
+    },
+
+    update: (cache, { data: { addBook } }) => {
+      // cache.updateQuery doens't work if the new book contains mutliple genres
+      // instead using writeFragment allows to write book into cache as a normalized entity
+      const newBookRef = cache.writeFragment({
+        data: addBook,
+        fragment: gql`
+          fragment NewBook on Book {
+            id
+            title
+            published
+            genres
+            author {
+              id
+              name
+              born
+              bookCount
+            }
+          }
+        `,
+      });
+
+      cache.modify({
+        fields: {
+          allBooks(existingBookRefs = []) {
+            if (
+              existingBookRefs.some((ref) => ref.__ref === newBookRef.__ref)
+            ) {
+              return existingBookRefs;
+            }
+            return [...existingBookRefs, newBookRef];
+          },
+        },
+      });
+
+      const newAuthorRef = cache.writeFragment({
+        data: addBook.author,
+        fragment: gql`
+          fragment NewAuthor on Author {
+            id
+            name
+            born
+            bookCount
+          }
+        `,
+      });
+
+      cache.modify({
+        fields: {
+          allAuthors(existingAuthorRefs = []) {
+            if (
+              existingAuthorRefs.some((ref) => ref.__ref === newAuthorRef.__ref)
+            ) {
+              return existingAuthorRefs;
+            }
+            return [...existingAuthorRefs, newAuthorRef];
+          },
+        },
+      });
     },
   });
   if (!props.show) {
@@ -27,8 +86,6 @@ const NewBook = (props) => {
     createBook({
       variables: { title, published: Number(published), author, genres },
     });
-
-    console.log("add book...");
 
     setTitle("");
     setPublished("");
