@@ -1,17 +1,20 @@
 /* eslint-disable react/prop-types */
 import { useState, useEffect } from "react";
-import { useQuery, useApolloClient } from "@apollo/client";
+import { gql, useQuery, useApolloClient, useSubscription } from "@apollo/client";
 import Authors from "./components/Authors";
 import Books from "./components/Books";
 import NewBook from "./components/NewBook";
 import LoginForm from "./components/LoginForm";
-import { LOGGED_USER_FAV_GENRE } from "./queries";
+import { LOGGED_USER_FAV_GENRE, BOOK_ADDED } from "./queries";
 
-const Notify = ({ errorMessage }) => {
-  if (!errorMessage) {
-    return null;
+const Notify = ({ errorMessage, notifMessage }) => {
+  if (errorMessage){
+    return <div style={{ color: "red" }}>{errorMessage}</div>;
   }
-  return <div style={{ color: "red" }}>{errorMessage}</div>;
+  if (notifMessage){
+    return <div style={{ color: "green" }}>{notifMessage}</div>;
+  }
+  return null
 };
 
 const App = () => {
@@ -19,8 +22,52 @@ const App = () => {
   const [token, setToken] = useState(null);
   const [page, setPage] = useState("authors");
   const [errorMessage, setErrorMessage] = useState(null);
+  const [notifMessage, setNotifMessage] = useState(null);
   const [genreToSearch, setGenreToSearch] = useState(null);
   const client = useApolloClient();
+  
+  const notify = (errorMessage = null, notifMessage = null) => {
+    if (errorMessage) {
+    setErrorMessage(errorMessage);
+    setNotifMessage(null); 
+    setTimeout(() => setErrorMessage(null), 5000);
+  } else if (notifMessage) {
+    setNotifMessage(notifMessage);
+    setErrorMessage(null);
+    setTimeout(() => setNotifMessage(null), 5000);
+  }
+  };
+
+  useSubscription(BOOK_ADDED, {
+    onData: ({ data, client }) => {
+      const addedBook = data.data.bookAdded
+      console.log(data)
+      notify(null,`New book added ${addedBook.title}`)
+      const newBookRef = client.cache.writeFragment({
+              data: addedBook,
+              fragment: gql`
+                fragment NewBook on Book {
+                  id
+                  title
+                  published
+                  genres
+                }
+              `,
+            });
+      client.cache.modify({
+        fields: {
+          allBooks(existingBookRefs = []) {
+            if (
+              existingBookRefs.some((ref) => ref.__ref === newBookRef.__ref)
+            ) {
+              return existingBookRefs;
+            }
+            return [...existingBookRefs, newBookRef];
+          },
+        },
+      });
+    }
+  })
 
   useEffect(() => {
     const loggedUserToken = window.localStorage.getItem("library-user-token");
@@ -29,12 +76,7 @@ const App = () => {
     }
   }, []);
 
-  const notify = (message) => {
-    setErrorMessage(message);
-    setTimeout(() => {
-      setErrorMessage(null);
-    }, 10000);
-  };
+  
 
   const logout = () => {
     setToken(null);
@@ -48,6 +90,7 @@ const App = () => {
   }
 
   const loggedUserFavGenre = userFavGenreQueryResult.data.me.favoriteGenre;
+  // const loggedUserFavGenre = null
 
   const onClickRecommend = () => {
     setGenreToSearch(loggedUserFavGenre);
@@ -61,7 +104,7 @@ const App = () => {
 
   return (
     <div>
-      <Notify errorMessage={errorMessage} />
+      <Notify errorMessage={errorMessage} notifMessage={notifMessage}/>
       <div>
         <button onClick={() => setPage("authors")}>authors</button>
         <button onClick={onClickBooks}>books</button>
