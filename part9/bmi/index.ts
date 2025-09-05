@@ -1,5 +1,5 @@
 import express from 'express';
-import { bmi } from './bmiCalculator'
+import { bmi } from './bmiCalculator';
 const app = express();
 
 app.get('/hello', (_req, res) => {
@@ -7,8 +7,8 @@ app.get('/hello', (_req, res) => {
 });
 
 app.get('/bmi', (req, res) => {
-  const height = req.query.height
-  const weight = req.query.weight
+  const height = req.query.height;
+  const weight = req.query.weight;
   res.send(bmi(Number(height), Number(weight)));
 });
 
