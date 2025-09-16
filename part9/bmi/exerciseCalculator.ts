@@ -8,12 +8,11 @@ const parseExerciseData = (args: string[]): number[] => {
   }
 };
 
-const exerciseResult = (data: number[]) => {
-  const trainingTarget = data.shift()!; //non-null assertion - if array empty returns runtime error
+const exerciseResult = (target: number, data: number[]) => {
   const trainingDaysCount = data.filter((day) => day).length;
   const totalTrainingHours = data.reduce((a, b) => a + b, 0);
   const averageTrainingHours = totalTrainingHours / data.length;
-  const averageVsTargetPercent = averageTrainingHours * 100 / trainingTarget;
+  const averageVsTargetPercent = averageTrainingHours * 100 / target;
   let rating = 0;
   let ratingDescription = "";
   if (averageVsTargetPercent < 40){
@@ -27,27 +26,33 @@ const exerciseResult = (data: number[]) => {
     ratingDescription = `you did ${averageVsTargetPercent}% of target training hours, good job`;
   }
 
-
   const result = {
     periodLength: data.length,
     trainingDays: trainingDaysCount,
-    success: averageTrainingHours >= trainingTarget ? true : false,
+    success: averageTrainingHours >= target ? true : false,
     rating: rating,
     ratingDescription: ratingDescription,
-    target: trainingTarget,
+    target: target,
     average: averageTrainingHours
   };
-
-  console.log(result);
+  return result;
 };
 
-try {
-  const ar = parseExerciseData(process.argv);
-  exerciseResult(ar);
+if (require.main === module) {
+    const array = parseExerciseData(process.argv);
+    const target = array.shift()!; //non-null assertion - if array empty returns runtime error
+    exerciseResult(target, array);
+}
+
+export const execiseCalc = (target:number, hours:number[]) => {
+  try {
+  return exerciseResult(target, hours);
 } catch (error: unknown) {
   let errorMessage = 'Something bad happened.';
   if (error instanceof Error) {
     errorMessage += ' Error: ' + error.message;
   }
   console.log(errorMessage);
+  return { error: errorMessage};
 }
+};
